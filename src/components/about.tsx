@@ -1,32 +1,12 @@
 "use client";
 
-import {
-  motion,
-  useScroll,
-  useTransform,
-  useSpring,
-  // useMotionValue,
-  // useMotionTemplate,
-} from "framer-motion";
+import { motion, useSpring } from "framer-motion";
 import { useRef } from "react";
 
 export default function About() {
   const ref = useRef(null);
 
-  // Scroll-based animation
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-
-  const x = useTransform(
-    scrollYProgress,
-    [0, 0.2, 0.3, 0.5, 0.7, 0.8, 1],
-    ["-100%", "-100%", "0%", "0%", "0%", "100%", "100%"]
-  );
-  const springX = useSpring(x, { stiffness: 2000, damping: 100 });
-
-  // Hover gradient animation logic
+  // Hover gradient animation logic (kept intact for your future use)
   const mouseX = useSpring(0, { stiffness: 500, damping: 100 });
   const mouseY = useSpring(0, { stiffness: 500, damping: 100 });
 
@@ -36,6 +16,7 @@ export default function About() {
     mouseY.set(clientY - top);
   }
 
+  // If you uncomment these later, make sure to import useMotionTemplate
   // const maskImage = useMotionTemplate`radial-gradient(240px at ${mouseX}px ${mouseY}px, white, transparent)`;
   // const style = { maskImage, WebkitMaskImage: maskImage };
 
@@ -46,8 +27,13 @@ export default function About() {
     >
       <motion.div
         onMouseMove={onMouseMove}
-        className="relative bg-gradient-to-br from-zinc-800 via-zinc-700 to-zinc-900 text-white px-10 py-12 rounded-3xl shadow-2xl max-w-5xl w-[90%] overflow-hidden border border-transparent hover:border-zinc-400/60 group transition-all duration-500"
-        style={{ x: springX }}
+        // Smooth entrance animation: fades in, slides up slightly, and scales to normal
+        initial={{ opacity: 0, y: 50, scale: 0.95 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        // amount: 0.3 means the animation triggers when 30% of the card is visible
+        viewport={{ once: false, amount: 0.3 }} 
+        className="relative bg-gradient-to-br from-zinc-800 via-zinc-700 to-zinc-900 text-white px-10 py-12 rounded-3xl shadow-2xl max-w-5xl w-[90%] overflow-hidden border border-transparent hover:border-zinc-400/60 group transition-colors duration-500"
       >
         <div className="flex flex-col md:flex-row items-center gap-12">
           {/* Image Section */}
@@ -77,7 +63,7 @@ export default function About() {
               <span className="font-semibold text-white drop-shadow-glow">
                 driven
               </span>{" "}
-              3rd Year Computer Science student who enjoys bringing ideas to life
+              4th Year Computer Science student who enjoys bringing ideas to life
               through code.
             </p>
             <p>
