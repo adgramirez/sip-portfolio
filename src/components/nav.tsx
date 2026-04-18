@@ -20,7 +20,7 @@ export const Navigation: React.FC = () => {
   return (
     <header ref={ref}>
       <div
-        className={`animate-fade-in fixed inset-x-0 top-0 z-50 backdrop-blur duration-200 border-b ${
+        className={`fixed inset-x-0 top-0 z-50 backdrop-blur duration-200 border-b animate-fade-in ${
           isIntersecting
             ? "bg-zinc-900/0 border-transparent"
             : "bg-zinc-900/500 border-zinc-800"
@@ -29,25 +29,23 @@ export const Navigation: React.FC = () => {
         <div className="container flex items-center justify-between p-6 mx-auto">
           {/* Navigation Links (Desktop) */}
           <div className="hidden lg:flex items-center justify-between w-full">
-            {/* AARON Title Link */}
-            <a
-              href="#home"
+            <Link
+              href="/"
               className="text-white text-2xl font-display tracking-wide font-bold hover:text-zinc-300 transition duration-200"
             >
-              AARON DANIEL RAMIREZ
-            </a>
+              HOME
+            </Link>
 
-            {/* Other Navigation Links */}
             <div className="flex items-center gap-8">
-              <a href="#about" className="duration-200 text-zinc-400 hover:text-zinc-100">
+              <Link href="/#about" className="duration-200 text-zinc-400 hover:text-zinc-100">
                 About
-              </a>
-              <a href="#projects" className="duration-200 text-zinc-400 hover:text-zinc-100">
-                Projects
-              </a>
-              <a href="#contact" className="duration-200 text-zinc-400 hover:text-zinc-100">
-                Contact
-              </a>
+              </Link>
+              <Link href="/#journey" className="duration-200 text-zinc-400 hover:text-zinc-100">
+                Journey Map
+              </Link>
+              <Link href="/#reflections" className="duration-200 text-zinc-400 hover:text-zinc-100">
+                Reflections
+              </Link>
               <Link
                 href="/resume"
                 className="px-4 py-2 text-white bg-blue-600 rounded-md shadow-md hover:bg-blue-700 duration-200"
@@ -69,12 +67,7 @@ export const Navigation: React.FC = () => {
               stroke="currentColor"
               className="w-6 h-6"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 6h16M4 12h16M4 18h16"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
         </div>
@@ -98,34 +91,29 @@ export const Navigation: React.FC = () => {
               stroke="currentColor"
               className="w-6 h-6"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
           <Link
-            href="#about"
+            href="/#about"
             className="duration-200 text-zinc-400 hover:text-zinc-100"
             onClick={() => setIsMenuOpen(false)}
           >
             About
           </Link>
           <Link
-            href="#projects"
+            href="/#journey"
             className="duration-200 text-zinc-400 hover:text-zinc-100"
             onClick={() => setIsMenuOpen(false)}
           >
-            Projects
+            Journey Map
           </Link>
           <Link
-            href="#contact"
+            href="/#reflections"
             className="duration-200 text-zinc-400 hover:text-zinc-100"
             onClick={() => setIsMenuOpen(false)}
           >
-            Contact
+            Reflections
           </Link>
           <Link
             href="/resume"
@@ -137,7 +125,6 @@ export const Navigation: React.FC = () => {
         </div>
       </div>
 
-      {/* Overlay for Sidebar */}
       {isMenuOpen && (
         <div
           onClick={() => setIsMenuOpen(false)}
