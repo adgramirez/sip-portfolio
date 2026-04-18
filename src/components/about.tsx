@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element */
+
 import { motion, useSpring } from "framer-motion";
 import { useRef } from "react";
 
