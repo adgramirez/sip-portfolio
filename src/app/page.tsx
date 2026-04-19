@@ -2,11 +2,97 @@
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable @next/next/no-img-element */
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Particles from "@/components/particles";
 import { Navigation } from "@/components/nav";
 
+// Reusable Gallery Component with Scroll Buttons
+const Gallery = ({ 
+  images, 
+  altPrefix, 
+  onImageClick 
+}: { 
+  images: string[]; 
+  altPrefix: string; 
+  onImageClick: (src: string) => void 
+}) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: "left" | "right") => {
+    if (scrollRef.current) {
+      const scrollAmount = direction === "left" ? -320 : 320; // Approximately one image width + gap
+      scrollRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    }
+  };
+
+  return (
+    <div className="relative w-full">
+      {/* Left Scroll Button (Always Visible) */}
+      <button
+        onClick={() => scroll("left")}
+        className="absolute left-2 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-full bg-zinc-900/90 text-white transition-all duration-300 hover:bg-zinc-700 hover:scale-110 border border-zinc-500 shadow-xl"
+        aria-label="Scroll left"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4 md:w-5 md:h-5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+        </svg>
+      </button>
+
+      {/* Scroll Container */}
+      <div
+        ref={scrollRef}
+        className="flex w-full gap-4 overflow-x-auto pb-4 pt-2 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+      >
+        {images.map((src, index) => (
+          <div 
+            key={index} 
+            onClick={() => onImageClick(src)}
+            className="relative flex-none w-64 sm:w-72 h-48 rounded-xl overflow-hidden snap-center border border-zinc-700/50 bg-zinc-800 cursor-pointer group/item"
+          >
+            <img
+              src={src}
+              alt={`${altPrefix} ${index + 1}`}
+              className="object-cover w-full h-full hover:scale-110 transition-transform duration-500"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = "none";
+              }}
+            />
+            {/* Subtle hover overlay to indicate it's clickable */}
+            <div 
+              className="absolute inset-0 bg-black/0 group-hover/item:bg-black/20 transition-colors duration-300 pointer-events-none flex items-center justify-center"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-8 h-8 text-white opacity-0 group-hover/item:opacity-100 transition-opacity duration-300 drop-shadow-md">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM10.5 7.5v6m3-3h-6" />
+              </svg>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Right Scroll Button (Always Visible) */}
+      <button
+        onClick={() => scroll("right")}
+        className="absolute right-2 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-full bg-zinc-900/90 text-white transition-all duration-300 hover:bg-zinc-700 hover:scale-110 border border-zinc-500 shadow-xl"
+        aria-label="Scroll right"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4 md:w-5 md:h-5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+        </svg>
+      </button>
+
+      {/* Helper Text */}
+      <p className="text-zinc-500 text-sm italic mt-[-10px] ml-2 animate-pulse">
+        <span className="md:hidden">Tap an image to enlarge, or swipe</span>
+        <span className="hidden md:inline">Click an image to enlarge, or use arrows</span> to see more photos &rarr;
+      </p>
+    </div>
+  );
+};
+
 export default function Home() {
+  // Lifted Lightbox State to the top level
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
   useEffect(() => {
     window.scrollTo(0, 0);
     // Add the 'no-scroll' class to disable scrolling during intro animation
@@ -122,9 +208,8 @@ export default function Home() {
                   </p>
                 </div>
 
-                {/* Horizontal Image Gallery for Year 1 */}
-                <div className="flex w-full gap-4 overflow-x-auto pb-4 pt-2 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                  {[
+                <Gallery 
+                  images={[
                     "/assets/JourneyMapPics/Year1/year1a.jpg",
                     "/assets/JourneyMapPics/Year1/year1b.jpg",
                     "/assets/JourneyMapPics/Year1/year1c.png",
@@ -135,25 +220,15 @@ export default function Home() {
                     "/assets/JourneyMapPics/Year1/year1h.jpg",
                     "/assets/JourneyMapPics/Year1/year1i.jpg",
                     "/assets/JourneyMapPics/Year1/year1j.jpg",
-                  ].map((src, index) => (
-                    <div key={index} className="relative flex-none w-64 sm:w-72 h-48 rounded-xl overflow-hidden snap-center border border-zinc-700/50 bg-zinc-800">
-                      <img
-                        src={src}
-                        alt={`Year 1 Memory ${String.fromCharCode(97 + index)}`}
-                        className="object-cover w-full h-full hover:scale-110 transition-transform duration-500"
-                      />
-                    </div>
-                  ))}
-                </div>
-                <p className="text-zinc-500 text-sm italic mt-[-10px] ml-2 animate-pulse">
-                  Swipe horizontally to see more photos →
-                </p>
+                  ]}
+                  altPrefix="Year 1 Memory"
+                  onImageClick={setSelectedImage}
+                />
               </div>
             </div>
 
             {/* Year 2 Item */}
             <div className="relative group">
-              {/* Timeline Node / Dot */}
               <div className="absolute -left-[41px] md:-left-[57px] top-1.5 w-5 h-5 rounded-full bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.6)] group-hover:scale-125 group-hover:bg-cyan-400 transition-all duration-300" />
               
               <div className="flex flex-col gap-6">
@@ -179,9 +254,8 @@ export default function Home() {
                   </p>
                 </div>
 
-                {/* Horizontal Image Gallery for Year 2 */}
-                <div className="flex w-full gap-4 overflow-x-auto pb-4 pt-2 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                  {[
+                <Gallery 
+                  images={[
                     "/assets/JourneyMapPics/Year2/year2a.jpg",
                     "/assets/JourneyMapPics/Year2/year2b.jpg",
                     "/assets/JourneyMapPics/Year2/year2c.jpg",
@@ -191,29 +265,15 @@ export default function Home() {
                     "/assets/JourneyMapPics/Year2/year2g.jpg",
                     "/assets/JourneyMapPics/Year2/year2h.jpg",
                     "/assets/JourneyMapPics/Year2/year2i.jpg",
-                  ].map((src, index) => (
-                    <div key={index} className="relative flex-none w-64 sm:w-72 h-48 rounded-xl overflow-hidden snap-center border border-zinc-700/50 bg-zinc-800">
-                      <img
-                        src={src}
-                        alt={`Year 2 Memory ${index + 1}`}
-                        className="object-cover w-full h-full hover:scale-110 transition-transform duration-500"
-                        // Fallback in case some images are missing
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = 'none';
-                        }}
-                      />
-                    </div>
-                  ))}
-                </div>
-                <p className="text-zinc-500 text-sm italic mt-[-10px] ml-2 animate-pulse">
-                  Swipe horizontally to see more photos →
-                </p>
+                  ]}
+                  altPrefix="Year 2 Memory"
+                  onImageClick={setSelectedImage}
+                />
               </div>
             </div>
 
             {/* Year 3 Item */}
             <div className="relative group">
-              {/* Timeline Node / Dot */}
               <div className="absolute -left-[41px] md:-left-[57px] top-1.5 w-5 h-5 rounded-full bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.6)] group-hover:scale-125 group-hover:bg-cyan-400 transition-all duration-300" />
               
               <div className="flex flex-col gap-6">
@@ -236,9 +296,8 @@ export default function Home() {
                   </p>
                 </div>
 
-                {/* Horizontal Image Gallery for Year 3 */}
-                <div className="flex w-full gap-4 overflow-x-auto pb-4 pt-2 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                  {[
+                <Gallery 
+                  images={[
                     "/assets/JourneyMapPics/Year3/year3a.jpg",
                     "/assets/JourneyMapPics/Year3/year3b.jpg",
                     "/assets/JourneyMapPics/Year3/year3c.jpg",
@@ -248,28 +307,16 @@ export default function Home() {
                     "/assets/JourneyMapPics/Year3/year3g.jpg",
                     "/assets/JourneyMapPics/Year3/year3h.jpg",
                     "/assets/JourneyMapPics/Year3/year3i.jpg",
-                  ].map((src, index) => (
-                    <div key={index} className="relative flex-none w-64 sm:w-72 h-48 rounded-xl overflow-hidden snap-center border border-zinc-700/50 bg-zinc-800">
-                      <img
-                        src={src}
-                        alt={`Year 3 Memory ${index + 1}`}
-                        className="object-cover w-full h-full hover:scale-110 transition-transform duration-500"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = 'none';
-                        }}
-                      />
-                    </div>
-                  ))}
-                </div>
-                <p className="text-zinc-500 text-sm italic mt-[-10px] ml-2 animate-pulse">
-                  Swipe horizontally to see more photos →
-                </p>
+                    "/assets/JourneyMapPics/Year3/year3j.jpg",
+                  ]}
+                  altPrefix="Year 3 Memory"
+                  onImageClick={setSelectedImage}
+                />
               </div>
             </div>
 
             {/* Year 4 Item */}
             <div className="relative group">
-              {/* Timeline Node / Dot */}
               <div className="absolute -left-[41px] md:-left-[57px] top-1.5 w-5 h-5 rounded-full bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.6)] group-hover:scale-125 group-hover:bg-cyan-400 transition-all duration-300" />
               
               <div className="flex flex-col gap-6">
@@ -298,11 +345,11 @@ export default function Home() {
                   </p>
                 </div>
 
-                {/* Horizontal Image Gallery for Year 4 */}
-                <div className="flex w-full gap-4 overflow-x-auto pb-4 pt-2 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                  {[
+                <Gallery 
+                  images={[
                     "/assets/JourneyMapPics/Year4/year4a.jpeg",
                     "/assets/JourneyMapPics/Year4/year4b.jpeg",
+                    "/assets/JourneyMapPics/Year4/year4j.jpg",
                     "/assets/JourneyMapPics/Year4/year4c.jpg",
                     "/assets/JourneyMapPics/Year4/year4d.jpg",
                     "/assets/JourneyMapPics/Year4/year4e.jpg",
@@ -310,23 +357,13 @@ export default function Home() {
                     "/assets/JourneyMapPics/Year4/year4g.jpg",
                     "/assets/JourneyMapPics/Year4/year4h.jpg",
                     "/assets/JourneyMapPics/Year4/year4i.jpg",
-                    "/assets/JourneyMapPics/Year4/year4j.jpg"
-                  ].map((src, index) => (
-                    <div key={index} className="relative flex-none w-64 sm:w-72 h-48 rounded-xl overflow-hidden snap-center border border-zinc-700/50 bg-zinc-800">
-                      <img
-                        src={src}
-                        alt={`Year 4 Memory ${index + 1}`}
-                        className="object-cover w-full h-full hover:scale-110 transition-transform duration-500"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = 'none';
-                        }}
-                      />
-                    </div>
-                  ))}
-                </div>
-                <p className="text-zinc-500 text-sm italic mt-[-10px] ml-2 animate-pulse">
-                  Swipe horizontally to see more photos →
-                </p>
+                    "/assets/JourneyMapPics/Year4/year4k.jpg",
+                    "/assets/JourneyMapPics/Year4/year4l.jpg",
+                    "/assets/JourneyMapPics/Year4/year4m.jpg",
+                  ]}
+                  altPrefix="Year 4 Memory"
+                  onImageClick={setSelectedImage}
+                />
               </div>
             </div>
 
@@ -365,6 +402,33 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Lightbox / Modal Overlay (Moved to top level) */}
+      {selectedImage && (
+        <div 
+          // REMOVED 'animate-fade-in' from the class list below
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md cursor-zoom-out"
+          onClick={() => setSelectedImage(null)}
+        >
+          {/* Close Button */}
+          <button 
+            className="absolute top-6 right-6 md:top-10 md:right-10 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+            onClick={() => setSelectedImage(null)}
+            aria-label="Close lightbox"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-10 h-10 md:w-12 md:h-12">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          {/* Enlarged Image */}
+          <img 
+            src={selectedImage} 
+            alt="Enlarged view" 
+            className="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl cursor-default"
+            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the image itself
+          />
+        </div>
+      )}
     </div>
   );
 }
